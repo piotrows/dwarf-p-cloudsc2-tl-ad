@@ -20,7 +20,7 @@ MODULE PYTEST_DRIVER_MOD
 CONTAINS
 
   SUBROUTINE CLOUDSC_DRIVER( &
-     & NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, PTSPHY, &
+     & NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS, PTSPHY, &
      & PT, PQ, &
      & TENDENCY_CML, TENDENCY_LOC, &
      & PAP,      PAPH, &
@@ -32,12 +32,12 @@ CONTAINS
     ! Driver routine that performans the parallel NPROMA-blocking and
     ! invokes the CLOUDSC2 kernel
 
-    INTEGER(KIND=JPIM), INTENT(IN)    :: NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG
+    INTEGER(KIND=JPIM), INTENT(IN)    :: NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG,NBLOCKS
     REAL(KIND=JPRB),    INTENT(IN)    :: PTSPHY       ! Physics timestep
     REAL(KIND=JPRB),    INTENT(IN)    :: PT(:,:,:)    ! T at start of callpar
     REAL(KIND=JPRB),    INTENT(IN)    :: PQ(:,:,:)    ! Q at start of callpar
-    TYPE(STATE_TYPE),   INTENT(IN)    :: TENDENCY_CML(NGPTOT) ! cumulative tendency used for final output
-    TYPE(STATE_TYPE),   INTENT(OUT)   :: TENDENCY_LOC(NGPTOT) ! local tendency from cloud scheme
+    TYPE(STATE_TYPE),   INTENT(IN)    :: TENDENCY_CML(NBLOCKS) ! cumulative tendency used for final output
+    TYPE(STATE_TYPE),   INTENT(OUT)   :: TENDENCY_LOC(NBLOCKS) ! local tendency from cloud scheme
     REAL(KIND=JPRB),    INTENT(IN)    :: PAP(:,:,:)   ! Pressure on full levels
     REAL(KIND=JPRB),    INTENT(IN)    :: PAPH(:,:,:)  ! Pressure on half levels
     REAL(KIND=JPRB),    INTENT(IN)    :: PLU(:,:,:)   ! Conv. condensate
@@ -86,7 +86,7 @@ CONTAINS
 
          !-- These were uninitialized : meaningful only when we compare error differences
          PCOVPTOT(:,:,IBL) = 0.0_JPRB
-!        TENDENCY_LOC(IBL)%cld(:,:,NCLV) = 0.0_JPRB
+         TENDENCY_LOC(IBL)%cld(:,:,NCLV) = 0.0_JPRB
 
          ! Fill in ZQSAT
          CALL SATUR (1, ICEND, NPROMA, 1, NLEV, .TRUE., &

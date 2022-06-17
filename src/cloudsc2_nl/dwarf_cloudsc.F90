@@ -26,8 +26,9 @@ INTEGER(KIND=JPIM) :: IARGS, LENARG, JARG, I, JK
 
 INTEGER(KIND=JPIM) :: NUMOMP   = 1     ! Number of OpenMP threads for this run
 INTEGER(KIND=JPIM) :: NGPTOTG  = 16384 ! Number of grid points (as read from command line)
-INTEGER(KIND=JPIM) :: NPROMA   = 32    ! NPROMA blocking factor (currently active)
+INTEGER(KIND=JPIM) :: NPROMA   = 16384  ! NPROMA blocking factor (currently active)
 INTEGER(KIND=JPIM) :: NGPTOT           ! Local number of grid points
+INTEGER(KIND=JPIM) :: NBLOCKS          ! Number of blocks 
 
 REAL(KIND=JPRB) :: ZPRES(0:200),ZPRESF(200) ! KLEV should be bellow 200
 REAL(KIND=JPRB) :: VP00
@@ -74,6 +75,9 @@ IF (IARGS >= 3) THEN
   READ(CLARG(1:LENARG),*) NPROMA
 ENDIF
 
+!Compute the number of blocks based on NGPTOT and NPROMA 
+NBLOCKS = (NGPTOT / NPROMA) + MIN(MOD(NGPTOT,NPROMA), 1)
+
 CALL GET_ENVIRONMENT_VARIABLE('CLOUDSC2_WRITE_REFERENCE', WRITE_REFERENCE)
 
 ! TODO: Create a global global memory state from serialized input data
@@ -107,7 +111,7 @@ YRPHNC%LEVAPLS2=.false.
 YREPHLI%LPHYLIN=.true.
 
 ! Call the driver to perform the parallel loop over our kernel
-CALL CLOUDSC_DRIVER(NUMOMP, NPROMA, GLOBAL_STATE%KLEV, NGPTOT, NGPTOTG, GLOBAL_STATE%PTSPHY, &
+CALL CLOUDSC_DRIVER(NUMOMP, NPROMA, GLOBAL_STATE%KLEV, NGPTOT, NGPTOTG, NBLOCKS, GLOBAL_STATE%PTSPHY, &
      & GLOBAL_STATE%PT, GLOBAL_STATE%PQ, &
      & GLOBAL_STATE%TENDENCY_CML, GLOBAL_STATE%TENDENCY_LOC, &
      & GLOBAL_STATE%PAP,      GLOBAL_STATE%PAPH, &

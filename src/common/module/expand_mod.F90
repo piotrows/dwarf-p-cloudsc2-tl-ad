@@ -284,6 +284,9 @@ contains
        bend = merge(nlon, min(nlon, mod(gidx, nlon)+bsize-1), gidx==nlon)
        fidx = 1
        fend = bend - bidx + 1
+!      print *,b,fidx,fend,bidx,bend,gidx,bsize,nlon,nblocks
+!      call flush(6)
+!      if(gidx==nlon) STOP 'gidx.eq.nlon'
        field(fidx:fend,:,b) = buffer(bidx:bend,:)
 
        ! Fill block by looping over buffer

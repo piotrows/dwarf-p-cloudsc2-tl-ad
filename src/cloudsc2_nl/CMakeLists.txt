@@ -13,9 +13,20 @@ if( HAVE_CLOUDSC2_NL )
             satur.F90
             cuadjtqs.F90
             cloudsc2.F90
+            yomphyder.F90
+        DEFINITIONS ${CLOUDSC_DEFINITIONS}
+    )
+
+    ecbuild_add_library( TARGET pytest-cloudsc2-nl
+        SOURCES
+            pytest_driver_mod.F90
+            satur.F90
+            cuadjtqs.F90
+            cloudsc2.F90
         DEFINITIONS ${CLOUDSC_DEFINITIONS}
     )
     target_link_libraries( dwarf-cloudsc2-nl PRIVATE cloudsc-common-lib )
+    target_link_libraries( pytest-cloudsc2-nl PRIVATE cloudsc-common-lib )
 
     if( HAVE_OMP AND TARGET OpenMP::OpenMP_Fortran )
         target_link_libraries( dwarf-cloudsc2-nl PRIVATE OpenMP::OpenMP_Fortran )

@@ -20,8 +20,9 @@ MODULE CLOUDSC_DRIVER_MOD
 CONTAINS
 
   SUBROUTINE CLOUDSC_DRIVER( &
-     & NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, PTSPHY, &
-     & PT, PQ, TENDENCY_CML, TENDENCY_LOC, &
+     & NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS, PTSPHY, &
+     & PT, PQ, &
+     & TENDENCY_CML, TENDENCY_LOC, &
      & PAP,      PAPH, &
      & PLU,      PLUDE,    PMFU,     PMFD, &
      & PA,       PCLV,     PSUPSAT,&
@@ -31,12 +32,12 @@ CONTAINS
     ! Driver routine that performans the parallel NPROMA-blocking and
     ! invokes the CLOUDSC2 kernel
 
-    INTEGER(KIND=JPIM), INTENT(IN)    :: NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG
+    INTEGER(KIND=JPIM), INTENT(IN)    :: NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS
     REAL(KIND=JPRB),    INTENT(IN)    :: PTSPHY       ! Physics timestep
     REAL(KIND=JPRB),    INTENT(IN)    :: PT(:,:,:)    ! T at start of callpar
     REAL(KIND=JPRB),    INTENT(IN)    :: PQ(:,:,:)    ! Q at start of callpar
-    TYPE(STATE_TYPE),   INTENT(IN)    :: TENDENCY_CML(:) ! cumulative tendency used for final output
-    TYPE(STATE_TYPE),   INTENT(OUT)   :: TENDENCY_LOC(:) ! local tendency from cloud scheme
+    TYPE(STATE_TYPE),   INTENT(IN)    :: TENDENCY_CML(NBLOCKS) ! cumulative tendency used for final output
+    TYPE(STATE_TYPE),   INTENT(OUT)   :: TENDENCY_LOC(NBLOCKS) ! local tendency from cloud scheme
     REAL(KIND=JPRB),    INTENT(IN)    :: PAP(:,:,:)   ! Pressure on full levels
     REAL(KIND=JPRB),    INTENT(IN)    :: PAPH(:,:,:)  ! Pressure on half levels
     REAL(KIND=JPRB),    INTENT(IN)    :: PLU(:,:,:)   ! Conv. condensate
@@ -75,8 +76,9 @@ CONTAINS
     !$omp& num_threads(NUMOMP)
 
     ! Local timer for each thread
-    TID = GET_THREAD_NUM()
-    CALL TIMER%THREAD_START(TID)
+    ! TID = GET_THREAD_NUM()
+    TID=0
+    !CALL TIMER%THREAD_START(TID)
 
     !$omp do schedule(runtime)
     DO JKGLO=1,NGPTOT,NPROMA
