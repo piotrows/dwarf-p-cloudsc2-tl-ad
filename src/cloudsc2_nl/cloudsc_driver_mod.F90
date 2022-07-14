@@ -76,9 +76,8 @@ CONTAINS
     !$omp& num_threads(NUMOMP)
 
     ! Local timer for each thread
-    ! TID = GET_THREAD_NUM()
-    TID=0
-    !CALL TIMER%THREAD_START(TID)
+    TID = GET_THREAD_NUM()
+    CALL TIMER%THREAD_START(TID)
 
     !$omp do schedule(runtime)
     DO JKGLO=1,NGPTOT,NPROMA

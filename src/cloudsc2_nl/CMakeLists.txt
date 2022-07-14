@@ -17,16 +17,7 @@ if( HAVE_CLOUDSC2_NL )
         DEFINITIONS ${CLOUDSC_DEFINITIONS}
     )
 
-    ecbuild_add_library( TARGET pytest-cloudsc2-nl
-        SOURCES
-            pytest_driver_mod.F90
-            satur.F90
-            cuadjtqs.F90
-            cloudsc2.F90
-        DEFINITIONS ${CLOUDSC_DEFINITIONS}
-    )
     target_link_libraries( dwarf-cloudsc2-nl PRIVATE cloudsc-common-lib )
-    target_link_libraries( pytest-cloudsc2-nl PRIVATE cloudsc-common-lib )
 
     if( HAVE_OMP AND TARGET OpenMP::OpenMP_Fortran )
         target_link_libraries( dwarf-cloudsc2-nl PRIVATE OpenMP::OpenMP_Fortran )
@@ -40,5 +31,19 @@ if( HAVE_CLOUDSC2_NL )
       ${CMAKE_CURRENT_SOURCE_DIR}/../../config-files/input.h5 ${CMAKE_CURRENT_BINARY_DIR}/../../../input.h5 )
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
       ${CMAKE_CURRENT_SOURCE_DIR}/../../config-files/reference.h5 ${CMAKE_CURRENT_BINARY_DIR}/../../../reference.h5 )
-    
+    set(F90WRAP_SOURCES
+            yomphyder.F90
+            cloudsc_driver_mod.F90
+       )
+
+add_custom_command(OUTPUT ${F90WRAP_SOURCES}
+      COMMAND  f90wrap ${F90WRAP_SOURCES} -v -P
+      COMMAND pwd
+      COMMAND ls 
+      COMMAND  f2py-f90wrap   -c -L. -lsrc ${CMAKE_CURRENT_SOURCE_DIR}/f90wrap_cloudsc_driver_mod.f90 f90wrap_yomphyder.f90
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      COMMENT "Running F90wrap"
+      VERBATIM
+)    
+
 endif()
