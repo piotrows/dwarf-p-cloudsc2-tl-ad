@@ -1,6 +1,7 @@
 ecbuild_enable_fortran(REQUIRED MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/module)
 
-ecbuild_add_library( TARGET cloudsc-common-lib
+ecbuild_add_library( TARGET cloudsc-common-lib 
+#TYPE STATIC
     SOURCES
         module/parkind1.F90
         module/yoecldp.F90
