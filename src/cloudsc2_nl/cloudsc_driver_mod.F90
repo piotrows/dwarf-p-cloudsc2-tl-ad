@@ -28,8 +28,9 @@ CONTAINS
   END SUBROUTINE CLOUDSC_DRIVER_PRINT
 
   SUBROUTINE CLOUDSC_DRIVER_TEST( &
-     & NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS, PTSPHY, &
+     & NUMOMP, NPROMA, NLEV, NGPTOT, NGPBLKS,  NGPTOTG, PTSPHY, &
      & PT, PQ, &
+     & BUFFER_CML, BUFFER_LOC, &
 !     & TENDENCY_CML, TENDENCY_LOC, &
      & PAP,      PAPH, &
      & PLU,      PLUDE,    PMFU,     PMFD, &
@@ -40,12 +41,14 @@ CONTAINS
     ! Driver routine that performans the parallel NPROMA-blocking and
     ! invokes the CLOUDSC2 kernel
 
-    INTEGER(KIND=JPIM), INTENT(IN)    :: NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS
+    INTEGER(KIND=JPIM), INTENT(IN)    :: NUMOMP, NPROMA, NLEV, NGPTOT, NGPBLKS, NGPTOTG
     REAL(KIND=JPRB),    INTENT(IN)    :: PTSPHY       ! Physics timestep
     REAL(KIND=JPRB),    INTENT(IN)    :: PT(:,:,:)    ! T at start of callpar
     REAL(KIND=JPRB),    INTENT(IN)    :: PQ(:,:,:)    ! Q at start of callpar
 !    TYPE(STATE_TYPE),   INTENT(IN)    :: TENDENCY_CML(10) ! cumulative tendency used for final output
 !    TYPE(STATE_TYPE),   INTENT(OUT)   :: TENDENCY_LOC(10) ! local tendency from cloud scheme
+    REAL(KIND=JPRB), INTENT(INOUT) :: BUFFER_CML(NPROMA,NLEV,3+NCLV,NGPBLKS) ! Storage buffer for TENDENCY_CML
+    REAL(KIND=JPRB), INTENT(INOUT) :: BUFFER_LOC(NPROMA,NLEV,3+NCLV,NGPBLKS) ! Storage buffer for TENDENCY_LOC
     REAL(KIND=JPRB),    INTENT(IN)    :: PAP(:,:,:)   ! Pressure on full levels
     REAL(KIND=JPRB),    INTENT(IN)    :: PAPH(:,:,:)  ! Pressure on half levels
     REAL(KIND=JPRB),    INTENT(IN)    :: PLU(:,:,:)   ! Conv. condensate
@@ -61,7 +64,7 @@ CONTAINS
     REAL(KIND=JPRB),    INTENT(OUT)   :: PFHPSL(:,:,:) ! Enthalpy flux for liq
     REAL(KIND=JPRB),    INTENT(OUT)   :: PFHPSN(:,:,:) ! Enthalp flux for ice
 
-    INTEGER(KIND=JPIM) :: JKGLO,IBL,ICEND,NGPBLKS
+    INTEGER(KIND=JPIM) :: JKGLO,IBL,ICEND
 
     TYPE(PERFORMANCE_TIMER) :: TIMER
     REAL(KIND=JPRD), PARAMETER :: ZHPM = 3996006.0_JPRD  ! The nominal number of flops per 100 columns
@@ -70,7 +73,6 @@ CONTAINS
     LOGICAL            :: LDRAIN1D = .FALSE.
     REAL(KIND=JPRB)    :: ZQSAT(NPROMA,NLEV) ! local array
 
-    NGPBLKS = (NGPTOT / NPROMA) + MIN(MOD(NGPTOT,NPROMA), 1)
 1003 format(5x,'NUMPROC=',i0', NUMOMP=',i0,', NGPTOTG=',i0,', NPROMA=',i0,', NGPBLKS=',i0)
     if (irank == 0) then
       write(0,1003) NUMPROC,NUMOMP,NGPTOTG,NPROMA,NGPBLKS
@@ -100,20 +102,24 @@ CONTAINS
          CALL SATUR (1, ICEND, NPROMA, 1, NLEV, .TRUE., &
               & PAP(:,:,IBL), PT(:,:,IBL), ZQSAT(:,:), 2) 
 
-!        CALL CLOUDSC2 ( &
-!             &  1, ICEND, NPROMA, 1, NLEV, LDRAIN1D, &
-!             & PTSPHY,&
-!             & PAPH(:,:,IBL),  PAP(:,:,IBL), &
-!             & PQ(:,:,IBL), ZQSAT(:,:), PT(:,:,IBL), &
-!             & PCLV(:,:,NCLDQL,IBL), PCLV(:,:,NCLDQI,IBL), &
-!             & PLUDE(:,:,IBL), PLU(:,:,IBL), PMFU(:,:,IBL), PMFD(:,:,IBL),&
+         CALL CLOUDSC2 ( &
+              &  1, ICEND, NPROMA, 1, NLEV, LDRAIN1D, &
+              & PTSPHY,&
+              & PAPH(:,:,IBL),  PAP(:,:,IBL), &
+              & PQ(:,:,IBL), ZQSAT(:,:), PT(:,:,IBL), &
+              & PCLV(:,:,NCLDQL,IBL), PCLV(:,:,NCLDQI,IBL), &
+              & PLUDE(:,:,IBL), PLU(:,:,IBL), PMFU(:,:,IBL), PMFD(:,:,IBL),&
 !             &  TENDENCY_LOC(IBL)%T, TENDENCY_CML(IBL)%T, &
 !             &  TENDENCY_LOC(IBL)%Q, TENDENCY_CML(IBL)%Q, &
 !             &  TENDENCY_LOC(IBL)%CLD(:,:,NCLDQL), TENDENCY_CML(IBL)%CLD(:,:,NCLDQL), &
 !             &  TENDENCY_LOC(IBL)%CLD(:,:,NCLDQI), TENDENCY_CML(IBL)%CLD(:,:,NCLDQI), &
-!             &  PSUPSAT(:,:,IBL), &
-!             &  PA(:,:,IBL), PFPLSL(:,:,IBL),   PFPLSN(:,:,IBL), &
-!             &  PFHPSL(:,:,IBL),   PFHPSN(:,:,IBL), PCOVPTOT(:,:,IBL))
+              &  BUFFER_LOC(:,:,1,IBL), BUFFER_CML(:,:,1,IBL), &
+              &  BUFFER_LOC(:,:,3,IBL), BUFFER_CML(:,:,3,IBL), &
+              &  BUFFER_LOC(:,:,3+NCLDQL,IBL), BUFFER_CML(:,:,3+NCLDQL,IBL),  &
+              &  BUFFER_LOC(:,:,3+NCLDQI,IBL), BUFFER_CML(:,:,3+NCLDQI,IBL),  &
+              &  PSUPSAT(:,:,IBL), &
+              &  PA(:,:,IBL), PFPLSL(:,:,IBL),   PFPLSN(:,:,IBL), &
+              &  PFHPSL(:,:,IBL),   PFHPSN(:,:,IBL), PCOVPTOT(:,:,IBL))
 
          ! Log number of columns processed by this thread
          CALL TIMER%THREAD_LOG(TID, IGPC=ICEND)
