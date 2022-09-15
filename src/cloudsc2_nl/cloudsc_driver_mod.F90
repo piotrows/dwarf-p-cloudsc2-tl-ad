@@ -15,10 +15,13 @@ MODULE CLOUDSC_DRIVER_MOD
   USE CLOUDSC_MPI_MOD, ONLY: NUMPROC, IRANK
   USE TIMER_MOD, ONLY : PERFORMANCE_TIMER, GET_THREAD_NUM
   USE EC_PMON_MOD, ONLY: EC_PMON
+  USE CLOUDSC2_ARRAY_STATE_MOD, ONLY: CLOUDSC2_ARRAY_STATE
 
   IMPLICIT NONE
 !INTEGER, PARAMETER :: JPRB = SELECTED_REAL_KIND(13,300)
 INTEGER, PARAMETER :: JPRB = 8
+TYPE(CLOUDSC2_ARRAY_STATE) :: GLOBAL_STATE
+
 CONTAINS
 
   SUBROUTINE CLOUDSC_DRIVER_PRINT( &
@@ -74,20 +77,20 @@ CONTAINS
     REAL(KIND=JPRB)    :: ZQSAT(NPROMA,NLEV) ! local array
 
 1003 format(5x,'NUMPROC=',i0', NUMOMP=',i0,', NGPTOTG=',i0,', NPROMA=',i0,', NGPBLKS=',i0)
-    if (irank == 0) then
+!   if (irank == 0) then
       write(0,1003) NUMPROC,NUMOMP,NGPTOTG,NPROMA,NGPBLKS
-    end if
+!   end if
 
     ! Global timer for the parallel region
-    CALL TIMER%START(NUMOMP)
+!   CALL TIMER%START(NUMOMP)
 
     !$omp parallel default(shared) private(JKGLO,IBL,ICEND,TID) &
     !$omp& private(ZQSAT) &
     !$omp& num_threads(NUMOMP)
 
     ! Local timer for each thread
-    TID = GET_THREAD_NUM()
-    CALL TIMER%THREAD_START(TID)
+!   TID = GET_THREAD_NUM()
+!   CALL TIMER%THREAD_START(TID)
 
     !$omp do schedule(runtime)
     DO JKGLO=1,NGPTOT,NPROMA
@@ -95,13 +98,16 @@ CONTAINS
        ICEND=MIN(NPROMA,NGPTOT-JKGLO+1)
 
          !-- These were uninitialized : meaningful only when we compare error differences
+    print *, 'Test 1'; call flush()
          PCOVPTOT(:,:,IBL) = 0.0_JPRB
+    print *, 'Test 2'; call flush()
 !         TENDENCY_LOC(IBL)%cld(:,:,NCLV) = 0.0_JPRB
 
          ! Fill in ZQSAT
          CALL SATUR (1, ICEND, NPROMA, 1, NLEV, .TRUE., &
               & PAP(:,:,IBL), PT(:,:,IBL), ZQSAT(:,:), 2) 
 
+    print *, 'Test 3'; call flush()
          CALL CLOUDSC2 ( &
               &  1, ICEND, NPROMA, 1, NLEV, LDRAIN1D, &
               & PTSPHY,&
@@ -121,21 +127,22 @@ CONTAINS
               &  PA(:,:,IBL), PFPLSL(:,:,IBL),   PFPLSN(:,:,IBL), &
               &  PFHPSL(:,:,IBL),   PFHPSN(:,:,IBL), PCOVPTOT(:,:,IBL))
 
+    print *, 'Test 4'; call flush()
          ! Log number of columns processed by this thread
-         CALL TIMER%THREAD_LOG(TID, IGPC=ICEND)
+!         CALL TIMER%THREAD_LOG(TID, IGPC=ICEND)
       ENDDO
 
       !-- The "nowait" is here to get correct local timings (tloc) per thread
       !   i.e. we should not wait for slowest thread to finish before measuring tloc
       !$omp end do nowait
 
-      CALL TIMER%THREAD_END(TID)
+!      CALL TIMER%THREAD_END(TID)
 
       !$omp end parallel
 
-      CALL TIMER%END()
+!     CALL TIMER%END()
 
-      CALL TIMER%PRINT_PERFORMANCE(NPROMA, NGPBLKS, ZHPM, NGPTOT)
+!      CALL TIMER%PRINT_PERFORMANCE(NPROMA, NGPBLKS, ZHPM, NGPTOT)
     
   END SUBROUTINE CLOUDSC_DRIVER_TEST
 
@@ -244,5 +251,35 @@ CONTAINS
       CALL TIMER%PRINT_PERFORMANCE(NPROMA, NGPBLKS, ZHPM, NGPTOT)
     
   END SUBROUTINE CLOUDSC_DRIVER
+
+  SUBROUTINE CLOUDSC_DRIVER_INIT(NPROMA,NGPTOT,NGPTOTG)
+USE PARKIND1, ONLY: JPIM
+USE YOECLD   , ONLY : YRECLD
+USE YOPHNC   , ONLY : YRPHNC
+USE YOEPHLI  , ONLY : YREPHLI
+INTEGER(KIND=JPIM) :: NGPTOT,NGPTOTG,NPROMA 
+INTEGER(KIND=JPIM) ::  JK
+! TODO: Create a global global memory state from serialized input data
+CALL GLOBAL_STATE%LOAD(NPROMA, NGPTOT, NGPTOTG)
+
+!cloudsc2
+!set up other modules not initialized in cloudsc
+!YRECLD
+allocate(YRECLD)
+allocate(YRECLD%CETA(GLOBAL_STATE%KLEV))
+! security
+if (GLOBAL_STATE%KLEV>200) then
+  print *, ' Dimension of ZPRES/ZPRESF is too short. '
+  stop
+endif
+DO JK=1,GLOBAL_STATE%KLEV
+  YRECLD%CETA(JK)= GLOBAL_STATE%PAP(1,JK,1)/GLOBAL_STATE%PAPH(1,GLOBAL_STATE%KLEV+1,1)
+ENDDO
+! YRPHNC
+allocate(YRPHNC)
+YRPHNC%LEVAPLS2=.false.
+! overload LPHYLIN
+YREPHLI%LPHYLIN=.true.
+  END SUBROUTINE CLOUDSC_DRIVER_INIT
 
 END MODULE CLOUDSC_DRIVER_MOD

@@ -65,6 +65,16 @@ PRINT_VAR("CMAKE_CURRENT_BINARY_DIR")
   # add_custom_command(OUTPUT ${F90WRAP_SOURCES} TARGET dwarf-cloudsc2-nl POST_BUILD
          COMMAND pwd
          COMMAND ls 
+         COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR}/../../build/lib/libcloudsc-common-lib.dylib
+         COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR}/libcloudsc-common-lib.dylib 
+         COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/libcloudsc-common-lib.dylib 
+         COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/libdwarf-cloudsc2-nl-lib.dylib 
+         COMMAND ln -s 
+${CMAKE_CURRENT_SOURCE_DIR}/../../build/lib/libcloudsc-common-lib.dylib 
+${CMAKE_CURRENT_SOURCE_DIR}/libcloudsc-common-lib.dylib 
+         COMMAND ln -s
+${CMAKE_CURRENT_SOURCE_DIR}/../../build/lib/libdwarf-cloudsc2-nl-lib.dylib 
+${CMAKE_CURRENT_SOURCE_DIR}/libdwarf-cloudsc2-nl-lib.dylib 
          COMMAND  f90wrap -m${PYTHON_MODN} ${F90WRAP_SOURCES} -k kind_map -P
          COMMAND  f2py-f90wrap   -c -m _${PYTHON_MODN}  -L. -lcloudsc-common-lib  -ldwarf-cloudsc2-nl-lib f90wrap_cloudsc_driver_mod.f90 f90wrap_yomphyder.f90  
  #f90wrap_parkind1.f90

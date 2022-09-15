@@ -24,10 +24,11 @@ class Dwarf(f90wrap.runtime.FortranModule):
         
         
     @staticmethod
-    def do_dwarf_full_call(numomp, nproma, nlev, ngptot, ngptotg, nblocks,
+    def do_dwarf_full_call(numomp, nproma, nlev, ngptot, nblocks, ngptotg,
                            ptsphy,
                            pt, pq, 
              #             tendency_cml, tendency_loc, 
+                           buffer_cml, buffer_loc, 
                            pap,      paph, 
                            plu,      plude,    pmfu,     pmfd, 
                            pa,       pclv,     psupsat,
@@ -46,10 +47,11 @@ class Dwarf(f90wrap.runtime.FortranModule):
         nblocks: int
 
         """
-        _Exampledwarf.f90wrap_cloudsc_driver_test(numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot, ngptotg=ngptotg, nblocks=nblocks,
+        _Exampledwarf.f90wrap_cloudsc_driver_test(numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot,  ngpblks=nblocks, ngptotg=ngptotg,
                                                   ptsphy=ptsphy,
                                                    pt=pt, pq=pq,
                                                 #   tendency_cml=tendency_cml, tendency_loc=tendency_loc,
+                                                   buffer_cml=buffer_cml, buffer_loc=buffer_loc,
                                                    pap=pap,      paph=paph,
                                                    plu=plu,      plude=plude,    pmfu=pmfu,     pmfd=pmfd,
                                                    pa=pa,       pclv=pclv,     psupsat=psupsat,
@@ -57,34 +59,43 @@ class Dwarf(f90wrap.runtime.FortranModule):
                                                    pfplsl=pfplsl,   pfplsn=pfplsn,   pfhpsl=pfhpsl,   pfhpsn=pfhpsn)
 dwarf = Dwarf()
 numomp=1
-nproma=1
-nlev=1
-ngptot=1
-ngptotg=1
+nproma=100
+nlev=100
+ngptot=100
+ngptotg=100
 nblocks=1
-ndim=1
+ndim=5
 ptsphy=1.
-pt        = np.zeros((ngptot,nlev  ,ndim), order='F')
-pq        = np.zeros((ngptot,nlev  ,ndim), order='F')
-pap       = np.zeros((ngptot,nlev  ,ndim), order='F')
-paph      = np.zeros((ngptot,nlev+1,ndim), order='F')
-plu       = np.zeros((ngptot,nlev  ,ndim), order='F')
-plude     = np.zeros((ngptot,nlev  ,ndim), order='F')
-pmfu      = np.zeros((ngptot,nlev  ,ndim), order='F')
-pmfd      = np.zeros((ngptot,nlev  ,ndim), order='F')
-pa        = np.zeros((ngptot,nlev  ,ndim), order='F')
-pclv      = np.zeros((ngptot,nlev  ,ndim), order='F')
-psupsat   = np.zeros((ngptot,nlev  ,ndim), order='F')
-pcovptot  = np.zeros((ngptot,nlev  ,ndim), order='F')
-pfplsl    = np.zeros((ngptot,nlev+1,ndim), order='F')
-pfplsn    = np.zeros((ngptot,nlev+1,ndim), order='F')
-pfhpsl    = np.zeros((ngptot,nlev+1,ndim), order='F')
-pfhpsn    = np.zeros((ngptot,nlev+1,ndim), order='F')
+pt        = np.zeros((nproma,nlev  ,nblocks), order='F')
+pq        = np.zeros((nproma,nlev  ,nblocks), order='F')
+pap       = np.zeros((nproma,nlev  ,nblocks), order='F')
+paph      = np.zeros((nproma,nlev+1,nblocks), order='F')
+plu       = np.zeros((nproma,nlev  ,nblocks), order='F')
+plude     = np.zeros((nproma,nlev  ,nblocks), order='F')
+pmfu      = np.zeros((nproma,nlev  ,nblocks), order='F')
+pmfd      = np.zeros((nproma,nlev  ,nblocks), order='F')
+pa        = np.zeros((nproma,nlev  ,nblocks), order='F')
+pclv      = np.zeros((nproma,nlev  ,nblocks), order='F')
+psupsat   = np.zeros((nproma,nlev  ,nblocks), order='F')
+pcovptot  = np.zeros((nproma,nlev  ,nblocks), order='F')
+pfplsl    = np.zeros((nproma,nlev+1,nblocks), order='F')
+pfplsn    = np.zeros((nproma,nlev+1,nblocks), order='F')
+pfhpsl    = np.zeros((nproma,nlev+1,nblocks), order='F')
+pfhpsn    = np.zeros((nproma,nlev+1,nblocks), order='F')
+#loc_T     = np.zeros((nproma,nlev  ,nblocks), order='F')
+#loc_Q     = np.zeros((nproma,nlev  ,nblocks), order='F')
+#loc_CLD   = np.zeros((nproma,nlev  ,ndim, nblocks), order='F')
+#CML_T     = np.zeros((nproma,nlev  ,nblocks), order='F')
+#CML_Q     = np.zeros((nproma,nlev  ,nblocks), order='F')
+#CML_CLD   = np.zeros((nproma,nlev  ,ndim,nblocks), order='F')
+buffer_cml     = np.zeros((nproma,nlev,3+ndim,nblocks), order='F')
+buffer_loc     = np.zeros((nproma,nlev,3+ndim,nblocks), order='F')
 
 dwarf.do_dwarf_call(numomp, nproma, nlev, ngptot, ngptotg, nblocks)
-dwarf.do_dwarf_full_call(numomp, nproma, nlev, ngptot, ngptotg, nblocks,
+dwarf.do_dwarf_full_call(numomp, nproma, nlev, ngptot, nblocks, ngptotg,
                          ptsphy,
                          pt,pq,
+                         buffer_cml,buffer_loc,
                          pap, paph,
                          plu, plude, pmfu, pmfd,
                          pa,pclv,psupsat,
