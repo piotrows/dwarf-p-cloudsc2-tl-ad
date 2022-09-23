@@ -55,6 +55,10 @@ PRINT_VAR("CMAKE_CURRENT_BINARY_DIR")
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
       ${CMAKE_CURRENT_SOURCE_DIR}/../../config-files/reference.h5 ${CMAKE_CURRENT_BINARY_DIR}/../../../reference.h5 )
 
+    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../config-files/input.h5 ${CMAKE_CURRENT_SOURCE_DIR}/input.h5 )
+    execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../config-files/reference.h5 ${CMAKE_CURRENT_SOURCE_DIR}/reference.h5 )
      set(F90WRAP_SOURCES
              yomphyder.F90
              parkind1.F90
@@ -65,8 +69,6 @@ PRINT_VAR("CMAKE_CURRENT_BINARY_DIR")
   # add_custom_command(OUTPUT ${F90WRAP_SOURCES} TARGET dwarf-cloudsc2-nl POST_BUILD
          COMMAND pwd
          COMMAND ls 
-         COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR}/../../build/lib/libcloudsc-common-lib.dylib
-         COMMAND echo ${CMAKE_CURRENT_SOURCE_DIR}/libcloudsc-common-lib.dylib 
          COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/libcloudsc-common-lib.dylib 
          COMMAND rm -f ${CMAKE_CURRENT_SOURCE_DIR}/libdwarf-cloudsc2-nl-lib.dylib 
          COMMAND ln -s 

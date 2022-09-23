@@ -6,7 +6,7 @@ import numpy as np
 class Dwarf(f90wrap.runtime.FortranModule):
 
     @staticmethod
-    def do_dwarf_call(numomp, nproma, nlev, ngptot, ngptotg, nblocks):
+    def do_dwarf_call_full(numomp, nproma, nlev, ngptot, ngptotg, nblocks,ptsphy):
         """
         _Exampledwarf.cloudsc_driver_print(NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS) 
 
@@ -20,11 +20,167 @@ class Dwarf(f90wrap.runtime.FortranModule):
         nblocks: int
 
         """
-        _Exampledwarf.f90wrap_cloudsc_driver_print(numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot, ngptotg=ngptotg, nblocks=nblocks)
+        _Exampledwarf.f90wrap_cloudsc_driver_full_forpy(ptsphy=ptsphy, numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot, ngpblks=nblocks,ngptotg=ngptotg)
         
+
+    @staticmethod
+    def do_dwarf_init_call( numomp, nproma, nlev, ngptot, nblocks, ngptotg,
+                           ptsphy,
+                           pt, pq, 
+                           buffer_cml, buffer_loc, 
+                           pap,      paph, 
+                           plu,      plude,    pmfu,     pmfd, 
+                           pa,       pclv,     psupsat,
+                           pcovptot): 
+        """
+        _Exampledwarf.cloudsc_driver_print(NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS) 
+
+        Parameters
+        ----------
+        numomp : int
+        nproma : int
+        nlev   : int
+        ngptot : int
+        ngptotg: int
+        nblocks: int
+
+        """
+        _Exampledwarf.f90wrap_cloudsc_driver_init(
+                                                  ptsphy=ptsphy,
+                                                    numomp=numomp,
+                                                    nproma=nproma, 
+                                                  nlev=nlev,
+                                                   ngptot=ngptot, 
+                                                  ngpblks=nblocks, 
+                                                  ngptotg=ngptotg,
+                                                  output_pt=pt,
+                                                  output_pq=pq,
+                                                  output_buffer_cml=buffer_cml, 
+                                                  output_buffer_loc=buffer_loc,
+                                                  output_pap=pap,  
+                                                  output_paph=paph,
+                                                  output_plu=plu,
+                                                  output_plude=plude,
+                                                  output_pmfu=pmfu,
+                                                  output_pmfd=pmfd,
+                                                  output_pa=pa, 
+                                                  output_pclv=pclv,
+                                                  output_psupsat=psupsat,
+                                                  output_pcovptot=pcovptot)
         
     @staticmethod
-    def do_dwarf_full_call(numomp, nproma, nlev, ngptot, nblocks, ngptotg,
+    def do_dwarf_init_call( numomp, nproma, nlev, ngptot, nblocks, ngptotg,
+                           ptsphy,
+                           pt, pq, 
+                           buffer_cml, buffer_loc, 
+                           pap,      paph, 
+                           plu,      plude,    pmfu,     pmfd, 
+                           pa,       pclv,     psupsat,
+                           pcovptot): 
+        _Exampledwarf.f90wrap_cloudsc_driver_init( ptsphy=ptsphy,
+                                                    numomp=numomp,
+                                                    nproma=nproma, 
+                                                  nlev=nlev,
+                                                   ngptot=ngptot, 
+                                                  ngpblks=nblocks, 
+                                                  ngptotg=ngptotg,
+                                                  output_pt=pt,
+                                                  output_pq=pq,
+                                                  output_buffer_cml=buffer_cml, 
+                                                  output_buffer_loc=buffer_loc,
+                                                  output_pap=pap,  
+                                                  output_paph=paph,
+                                                  output_plu=plu,
+                                                  output_plude=plude,
+                                                  output_pmfu=pmfu,
+                                                  output_pmfd=pmfd,
+                                                  output_pa=pa, 
+                                                  output_pclv=pclv,
+                                                  output_psupsat=psupsat,
+                                                  output_pcovptot=pcovptot,
+                                                  output_pfplsl=pfplsl,
+                                                  output_pfplsn=pfplsn,
+                                                  output_pfhpsl=pfhpsl,
+                                                  output_pfhpsn=pfhpsn,
+                                                  )
+
+
+    @staticmethod
+    def do_dwarf_inittest_call( numomp, nproma, nlev, ngptot, nblocks, ngptotg,
+                           ptsphy,
+                           pt, pq, 
+                           buffer_cml, buffer_loc, 
+                           pap,      paph, 
+                           plu,      plude,    pmfu,     pmfd, 
+                           pa,       pclv,     psupsat,
+                           pcovptot,
+                           pfplsl,   pfplsn,   pfhpsl,   pfhpsn):
+
+        _Exampledwarf.f90wrap_cloudsc_driver_inittest(
+                           ptsphy=ptsphy,
+                             numomp=numomp,
+                             nproma=nproma, 
+                           nlev=nlev,
+                            ngptot=ngptot, 
+                           ngpblks=nblocks, 
+                           ngptotg=ngptotg,
+                           output_pt=pt,
+                           output_pq=pq,
+                           output_buffer_cml=buffer_cml, 
+                           output_buffer_loc=buffer_loc,
+                           output_pap=pap,  
+                           output_paph=paph,
+                           output_plu=plu,
+                           output_plude=plude,
+                           output_pmfu=pmfu,
+                           output_pmfd=pmfd,
+                           output_pa=pa, 
+                           output_pclv=pclv,
+                           output_psupsat=psupsat,
+                           output_pcovptot=pcovptot,
+                           output_pfplsl=pfplsl,
+                           output_pfplsn=pfplsn,
+                           output_pfhpsl=pfhpsl,
+                           output_pfhpsn=pfhpsn,
+)
+
+
+    @staticmethod
+    def do_dwarf_validate_call(
+                           numomp, nproma, nlev, ngptot, nblocks, ngptotg,
+                           ptsphy,
+                           pt, pq, 
+                           buffer_cml, buffer_loc, 
+                           pap,      paph, 
+                           plu,      plude,    pmfu,     pmfd, 
+                           pa,       pclv,     psupsat,
+                           pcovptot, 
+                           pfplsl,   pfplsn,   pfhpsl,   pfhpsn):
+        """
+        _Exampledwarf.cloudsc_driver_print(NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS) 
+
+        Parameters
+        ----------
+        numomp : int
+        nproma : int
+        nlev   : int
+        ngptot : int
+        ngptotg: int
+        nblocks: int
+
+        """
+        _Exampledwarf.f90wrap_cloudsc_driver_validate( numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot, ngpblks=nblocks, ngptotg=ngptotg,
+                                                 ptsphy=ptsphy,
+                                                   input_pt=pt, input_pq=pq,
+                                                   input_buffer_cml=buffer_cml, input_buffer_loc=buffer_loc,
+                                                   input_pap=pap,      input_paph=paph,
+                                                   input_plu=plu,      input_plude=plude,    input_pmfu=pmfu,     input_pmfd=pmfd,
+                                                   input_pa=pa,        input_pclv=pclv,     input_psupsat=psupsat,
+                                                   input_pcovptot=pcovptot, input_pfplsl=pfplsl,   input_pfplsn=pfplsn,   input_pfhpsl=pfhpsl,   input_pfhpsn=pfhpsn)
+
+    @staticmethod
+    def do_dwarf_full_call(
+                           numomp, nproma, nlev, ngptot, nblocks, ngptotg,
                            ptsphy,
                            pt, pq, 
              #             tendency_cml, tendency_loc, 
@@ -47,7 +203,8 @@ class Dwarf(f90wrap.runtime.FortranModule):
         nblocks: int
 
         """
-        _Exampledwarf.f90wrap_cloudsc_driver_test(numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot,  ngpblks=nblocks, ngptotg=ngptotg,
+        _Exampledwarf.f90wrap_cloudsc_driver_test(
+                                                  numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot,  ngpblks=nblocks, ngptotg=ngptotg,
                                                   ptsphy=ptsphy,
                                                    pt=pt, pq=pq,
                                                 #   tendency_cml=tendency_cml, tendency_loc=tendency_loc,
@@ -57,15 +214,21 @@ class Dwarf(f90wrap.runtime.FortranModule):
                                                    pa=pa,       pclv=pclv,     psupsat=psupsat,
                                                    pcovptot=pcovptot,
                                                    pfplsl=pfplsl,   pfplsn=pfplsn,   pfhpsl=pfhpsl,   pfhpsn=pfhpsn)
+    def examine_ndarray_flags(varname,ndvar):
+        print ("Checking flags of array: ",varname)
+        print (ndvar.flags)
+        print ("End of flags of array: ",varname)
+ 
+
 dwarf = Dwarf()
 numomp=1
-nproma=100
-nlev=100
-ngptot=100
-ngptotg=100
+nproma=16384
+nlev=137
+ngptot=16384
+ngptotg=16384
 nblocks=1
 ndim=5
-ptsphy=1.
+ptsphy=3600.
 pt        = np.zeros((nproma,nlev  ,nblocks), order='F')
 pq        = np.zeros((nproma,nlev  ,nblocks), order='F')
 pap       = np.zeros((nproma,nlev  ,nblocks), order='F')
@@ -75,7 +238,7 @@ plude     = np.zeros((nproma,nlev  ,nblocks), order='F')
 pmfu      = np.zeros((nproma,nlev  ,nblocks), order='F')
 pmfd      = np.zeros((nproma,nlev  ,nblocks), order='F')
 pa        = np.zeros((nproma,nlev  ,nblocks), order='F')
-pclv      = np.zeros((nproma,nlev  ,nblocks), order='F')
+pclv      = np.zeros((nproma,nlev  ,nblocks,ndim), order='F')
 psupsat   = np.zeros((nproma,nlev  ,nblocks), order='F')
 pcovptot  = np.zeros((nproma,nlev  ,nblocks), order='F')
 pfplsl    = np.zeros((nproma,nlev+1,nblocks), order='F')
@@ -90,9 +253,44 @@ pfhpsn    = np.zeros((nproma,nlev+1,nblocks), order='F')
 #CML_CLD   = np.zeros((nproma,nlev  ,ndim,nblocks), order='F')
 buffer_cml     = np.zeros((nproma,nlev,3+ndim,nblocks), order='F')
 buffer_loc     = np.zeros((nproma,nlev,3+ndim,nblocks), order='F')
+#dwarf.do_dwarf_call_full(numomp, nproma, nlev, ngptot, ngptotg, nblocks, ptsphy)
+print("Filling with 33")
+buffer_loc.fill(-33.)
+print("Filled with 33")
+dwarf.examine_ndarray_flags(buffer_cml)
+dwarf.examine_ndarray_flags(buffer_loc)
+dwarf.examine_ndarray_flags(pt)
+dwarf.examine_ndarray_flags(pt)
 
-dwarf.do_dwarf_call(numomp, nproma, nlev, ngptot, ngptotg, nblocks)
-dwarf.do_dwarf_full_call(numomp, nproma, nlev, ngptot, nblocks, ngptotg,
+
+dwarf.do_dwarf_inittest_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
+                         ptsphy,
+                         pt,pq,
+                         buffer_cml,buffer_loc,
+                         pap, paph,
+                         plu, plude, pmfu, pmfd,
+                         pa,pclv,psupsat,
+                         pcovptot,
+                         pfplsl, pfplsn, pfhpsl, pfhpsn)
+#dwarf.do_dwarf_init_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
+#                         ptsphy,
+#                         pt,pq,
+#                         buffer_cml,buffer_loc,
+#                         pap, paph,
+#                         plu, plude, pmfu, pmfd,
+#                         pa,pclv,psupsat,
+#                         pcovptot)
+#
+#dwarf.do_dwarf_full_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
+#                         ptsphy,
+#                         pt,pq,
+#                         buffer_cml,buffer_loc,
+#                         pap, paph,
+#                         plu, plude, pmfu, pmfd,
+#                         pa,pclv,psupsat,
+#                         pcovptot,
+#                         pfplsl, pfplsn, pfhpsl, pfhpsn)
+dwarf.do_dwarf_validate_call(numomp, nproma, nlev, ngptot, nblocks, ngptotg,
                          ptsphy,
                          pt,pq,
                          buffer_cml,buffer_loc,
