@@ -292,7 +292,9 @@ IF(NGPBLKS.NE.OUTPUT_NGPBLKS) THEN
    STOP 'NGPBLKS invalid in Python driver'
 ENDIF
 ! TODO: Create a global global memory state from serialized input data
+print *,'Test i1'
 CALL GLOBAL_STATE%LOAD(NPROMA, NGPTOT, NGPTOTG)
+print *,'Test i2'
   OUTPUT_NLEV  =GLOBAL_STATE%KLEV
 IF(NLEV.NE.OUTPUT_NLEV) THEN 
    PRINT *,'Fortran NLEV =',OUTPUT_NLEV
@@ -309,35 +311,57 @@ ENDIF
 !cloudsc2
 !set up other modules not initialized in cloudsc
 !YRECLD
+print *,'Test i3'
 allocate(YRECLD)
+print *,'Test i4'
 allocate(YRECLD%CETA(GLOBAL_STATE%KLEV))
 ! security
 if (GLOBAL_STATE%KLEV>200) then
   print *, ' Dimension of ZPRES/ZPRESF is too short. '
   stop
 endif
+print *,'Test i5'
 DO JK=1,GLOBAL_STATE%KLEV
   YRECLD%CETA(JK)= GLOBAL_STATE%PAP(1,JK,1)/GLOBAL_STATE%PAPH(1,GLOBAL_STATE%KLEV+1,1)
 ENDDO
+print *,'Test i6'
 ! YRPHNC
 allocate(YRPHNC)
+print *,'Test i7'
 YRPHNC%LEVAPLS2=.false.
+print *,'Test i8'
 ! overload LPHYLIN
 YREPHLI%LPHYLIN=.true.
+print *,'Test i9'
     OUTPUT_PT(:,:,:)=          GLOBAL_STATE%PT      (:,:,:)
+print *,'Test i9a'
     OUTPUT_PQ(:,:,:)=          GLOBAL_STATE%PQ      (:,:,:)
+print *,'Test i9b'
     OUTPUT_BUFFER_CML(:,:,:,:)=GLOBAL_STATE%B_CML   (:,:,:,:)
+print *,'Test i9c'
     OUTPUT_BUFFER_LOC(:,:,:,:)=GLOBAL_STATE%B_LOC   (:,:,:,:)
+print *,'Test i9d'
       OUTPUT_PAP(:,:,:)=       GLOBAL_STATE%PAP     (:,:,:)
+print *,'Test i9e'
      OUTPUT_PAPH(:,:,:)=       GLOBAL_STATE%PAPH    (:,:,:)
+print *,'Test i9f'
       OUTPUT_PLU(:,:,:)=       GLOBAL_STATE%PLU     (:,:,:)
+print *,'Test i9g'
     OUTPUT_PLUDE(:,:,:)=       GLOBAL_STATE%PLUDE   (:,:,:)
+print *,'Test i9h'
      OUTPUT_PMFU(:,:,:)=       GLOBAL_STATE%PMFU    (:,:,:)
+print *,'Test i9i'
      OUTPUT_PMFD(:,:,:)=       GLOBAL_STATE%PMFD    (:,:,:)
+print *,'Test i9j'
        OUTPUT_PA(:,:,:)=       GLOBAL_STATE%PA      (:,:,:)
+print *,'Test i9k'
+    print *,'PCLV shape',SHAPE(GLOBAL_STATE%PCLV),SHAPE(OUTPUT_PCLV)
      OUTPUT_PCLV(:,:,:,:)=       GLOBAL_STATE%PCLV  (:,:,:,:)
+print *,'Test i9l'
   OUTPUT_PSUPSAT(:,:,:)=       GLOBAL_STATE%PSUPSAT (:,:,:)
+print *,'Test i9m'
  OUTPUT_PCOVPTOT(:,:,:)=       GLOBAL_STATE%PCOVPTOT(:,:,:)
+print *,'Test i10'
 !  OUTPUT_PFPLSL(:,:,:)=       GLOBAL_STATE%PFPLSL  (:,:,:)
 !  OUTPUT_PFPLSN(:,:,:)=       GLOBAL_STATE%PFPLSN  (:,:,:)
 !  OUTPUT_PFHPSL(:,:,:)=       GLOBAL_STATE%PFHPSL  (:,:,:)
@@ -407,6 +431,7 @@ YREPHLI%LPHYLIN=.true.
     GLOBAL_STATE%PFHPSN(:,:,:)    =INPUT_PFHPSN(:,:,:)
     CALL GLOBAL_STATE%VALIDATE(NPROMA, NGPTOT, NGPTOTG)
   END SUBROUTINE CLOUDSC_DRIVER_VALIDATE
+
   SUBROUTINE CLOUDSC_DRIVER_FULL_FORPY( &
   PTSPHY, &
    NUMOMP, NPROMA, NLEV, NGPTOT, NGPBLKS, & 

@@ -20,54 +20,10 @@ class Dwarf(f90wrap.runtime.FortranModule):
         nblocks: int
 
         """
-        _Exampledwarf.f90wrap_cloudsc_driver_full_forpy(ptsphy=ptsphy, numomp=numomp, nproma=nproma, nlev=nlev, ngptot=ngptot, ngpblks=nblocks,ngptotg=ngptotg)
-        
+        _Exampledwarf.f90wrap_cloudsc_driver_full_forpy(ptsphy=ptsphy, numomp=numomp, 
+                                                        nproma=nproma, nlev=nlev,
+                                                        ngptot=ngptot, ngpblks=nblocks,ngptotg=ngptotg)
 
-    @staticmethod
-    def do_dwarf_init_call( numomp, nproma, nlev, ngptot, nblocks, ngptotg,
-                           ptsphy,
-                           pt, pq, 
-                           buffer_cml, buffer_loc, 
-                           pap,      paph, 
-                           plu,      plude,    pmfu,     pmfd, 
-                           pa,       pclv,     psupsat,
-                           pcovptot): 
-        """
-        _Exampledwarf.cloudsc_driver_print(NUMOMP, NPROMA, NLEV, NGPTOT, NGPTOTG, NBLOCKS) 
-
-        Parameters
-        ----------
-        numomp : int
-        nproma : int
-        nlev   : int
-        ngptot : int
-        ngptotg: int
-        nblocks: int
-
-        """
-        _Exampledwarf.f90wrap_cloudsc_driver_init(
-                                                  ptsphy=ptsphy,
-                                                    numomp=numomp,
-                                                    nproma=nproma, 
-                                                  nlev=nlev,
-                                                   ngptot=ngptot, 
-                                                  ngpblks=nblocks, 
-                                                  ngptotg=ngptotg,
-                                                  output_pt=pt,
-                                                  output_pq=pq,
-                                                  output_buffer_cml=buffer_cml, 
-                                                  output_buffer_loc=buffer_loc,
-                                                  output_pap=pap,  
-                                                  output_paph=paph,
-                                                  output_plu=plu,
-                                                  output_plude=plude,
-                                                  output_pmfu=pmfu,
-                                                  output_pmfd=pmfd,
-                                                  output_pa=pa, 
-                                                  output_pclv=pclv,
-                                                  output_psupsat=psupsat,
-                                                  output_pcovptot=pcovptot)
-        
     @staticmethod
     def do_dwarf_init_call( numomp, nproma, nlev, ngptot, nblocks, ngptotg,
                            ptsphy,
@@ -97,11 +53,7 @@ class Dwarf(f90wrap.runtime.FortranModule):
                                                   output_pa=pa, 
                                                   output_pclv=pclv,
                                                   output_psupsat=psupsat,
-                                                  output_pcovptot=pcovptot,
-                                                  output_pfplsl=pfplsl,
-                                                  output_pfplsn=pfplsn,
-                                                  output_pfhpsl=pfhpsl,
-                                                  output_pfhpsn=pfhpsn,
+                                                  output_pcovptot=pcovptot
                                                   )
 
 
@@ -238,7 +190,7 @@ plude     = np.zeros((nproma,nlev  ,nblocks), order='F')
 pmfu      = np.zeros((nproma,nlev  ,nblocks), order='F')
 pmfd      = np.zeros((nproma,nlev  ,nblocks), order='F')
 pa        = np.zeros((nproma,nlev  ,nblocks), order='F')
-pclv      = np.zeros((nproma,nlev  ,nblocks,ndim), order='F')
+pclv      = np.zeros((nproma,nlev  ,ndim, nblocks), order='F')
 psupsat   = np.zeros((nproma,nlev  ,nblocks), order='F')
 pcovptot  = np.zeros((nproma,nlev  ,nblocks), order='F')
 pfplsl    = np.zeros((nproma,nlev+1,nblocks), order='F')
@@ -263,25 +215,7 @@ dwarf.examine_ndarray_flags(pt)
 dwarf.examine_ndarray_flags(pt)
 
 
-dwarf.do_dwarf_inittest_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
-                         ptsphy,
-                         pt,pq,
-                         buffer_cml,buffer_loc,
-                         pap, paph,
-                         plu, plude, pmfu, pmfd,
-                         pa,pclv,psupsat,
-                         pcovptot,
-                         pfplsl, pfplsn, pfhpsl, pfhpsn)
-#dwarf.do_dwarf_init_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
-#                         ptsphy,
-#                         pt,pq,
-#                         buffer_cml,buffer_loc,
-#                         pap, paph,
-#                         plu, plude, pmfu, pmfd,
-#                         pa,pclv,psupsat,
-#                         pcovptot)
-#
-#dwarf.do_dwarf_full_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
+#dwarf.do_dwarf_inittest_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
 #                         ptsphy,
 #                         pt,pq,
 #                         buffer_cml,buffer_loc,
@@ -290,6 +224,24 @@ dwarf.do_dwarf_inittest_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
 #                         pa,pclv,psupsat,
 #                         pcovptot,
 #                         pfplsl, pfplsn, pfhpsl, pfhpsn)
+dwarf.do_dwarf_init_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
+                         ptsphy,
+                         pt,pq,
+                         buffer_cml,buffer_loc,
+                         pap, paph,
+                         plu, plude, pmfu, pmfd,
+                         pa,pclv,psupsat,
+                         pcovptot)
+
+dwarf.do_dwarf_full_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
+                         ptsphy,
+                         pt,pq,
+                         buffer_cml,buffer_loc,
+                         pap, paph,
+                         plu, plude, pmfu, pmfd,
+                         pa,pclv,psupsat,
+                         pcovptot,
+                         pfplsl, pfplsn, pfhpsl, pfhpsn)
 dwarf.do_dwarf_validate_call(numomp, nproma, nlev, ngptot, nblocks, ngptotg,
                          ptsphy,
                          pt,pq,
