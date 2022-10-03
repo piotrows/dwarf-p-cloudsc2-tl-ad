@@ -2,7 +2,10 @@ import _Exampledwarf
 import f90wrap.runtime
 import logging
 import numpy as np
-
+from pathlib import Path
+from collections import OrderedDict
+from cloudsc2_inputs import load_input_parameters, load_input_fields, load_reference_fields
+from cloudsc2_driver import arguments_from_fields 
 class Dwarf(f90wrap.runtime.FortranModule):
 
     @staticmethod
@@ -213,8 +216,21 @@ dwarf.examine_ndarray_flags(buffer_cml)
 dwarf.examine_ndarray_flags(buffer_loc)
 dwarf.examine_ndarray_flags(pt)
 dwarf.examine_ndarray_flags(pt)
+rootpath = Path(__file__).resolve().parents[2]
+input_path = rootpath/'config-files/input.h5'
+input_fields = load_input_fields(path=input_path)
+yrecldp, yrmcst, yrethf, yrephli, yrecld = load_input_parameters(path=input_path)
 
+klon = input_fields['KLON']
+klev = input_fields['KLEV']
 
+# Get referennce solution fields from file
+ref_path = rootpath/'config-files/reference.h5'
+ref_fields = load_reference_fields(path=ref_path)
+
+# Populate kernel inputs with raw fields (this splits compound arrays)
+satur_args, cloudsc_args = arguments_from_fields(input_fields)
+print (cloudsc_args.keys())
 #dwarf.do_dwarf_inittest_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
 #                         ptsphy,
 #                         pt,pq,

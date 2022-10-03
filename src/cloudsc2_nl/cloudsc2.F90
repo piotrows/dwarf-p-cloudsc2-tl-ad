@@ -219,12 +219,12 @@ REAL(KIND=JPRB) :: ZTARG, Z2S, ZCOND1, ZQP
 !     ------------------------------------------------------------------
 #include "fcttre.func.h"
 !     ------------------------------------------------------------------
-print *, 'Test c1'; call flush()
+!print *, 'Test c1'; call flush()
 ASSOCIATE(CETA=>YRECLD%CETA,RCLCRIT=>YRECLDP%RCLCRIT,RKCONV=>YRECLDP%RKCONV, &
 & RLMIN=>YRECLDP%RLMIN,RPECONS=>YRECLDP%RPECONS,LPHYLIN=>YREPHLI%LPHYLIN, &
 & RLPTRC=>YREPHLI%RLPTRC,LEVAPLS2=>YRPHNC%LEVAPLS2)
 
-print *, 'Test c2'; call flush()
+!print *, 'Test c2'; call flush()
 !IF (LHOOK) CALL DR_HOOK('CLOUDSC2',0,ZHOOK_HANDLE)
 
 !*         1.     SET-UP INPUT QUANTITIES
@@ -245,7 +245,7 @@ ZQMAX=0.5_JPRB
 ZEPS1=1.E-12_JPRB
 ZEPS2=1.E-10_JPRB
 
-print *, 'Test c3'; call flush()
+!print *, 'Test c3'; call flush()
 !     --------------------------------------------------------------------
 
 !*         2.1    COMPUTE CRITICAL RELATIVE HUMIDITY AND RELATIVE HUMIDITY
@@ -262,7 +262,7 @@ DO JK=1,KLEV
   ENDDO
 ENDDO
 
-print *, 'Test c4'; call flush()
+!print *, 'Test c4'; call flush()
 DO JK=1,KLEV
 
 ! Parameter for cloud formation
@@ -282,7 +282,7 @@ DO JK=1,KLEV
   ENDDO
 ENDDO
 
-print *, 'Test c5'; call flush()
+!print *, 'Test c5'; call flush()
 !     ------------------------------------------------------------------
 
 !*         2.2    INITIALIZATION OF CLOUD AND PRECIPITATION ARRAYS
@@ -305,7 +305,7 @@ DO JK=1,KLEV
   ENDDO
 ENDDO
 
-print *, 'Test c6'; call flush()
+!print *, 'Test c6'; call flush()
 !       Set to zero precipitation fluxes at the top
 
 DO JL=KIDIA,KFDIA
@@ -317,7 +317,7 @@ DO JL=KIDIA,KFDIA
   ZCOVPCLR(JL)=0.0_JPRB
 ENDDO
 
-print *, 'Test c7'; call flush()
+!print *, 'Test c7'; call flush()
 ! Eta value at tropopause
 DO JL=KIDIA,KFDIA
   ZTRPAUS(JL)=0.1_JPRB
@@ -332,7 +332,7 @@ DO JK=1,KLEV-1
   ENDDO
 ENDDO
 
-print *, 'Test c8'; call flush()
+!print *, 'Test c8'; call flush()
 !     ------------------------------------------------------------------
 
 !*        3. COMPUTE LAYER CLOUD AMOUNTS
