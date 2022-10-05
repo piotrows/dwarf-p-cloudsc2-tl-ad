@@ -27,7 +27,8 @@ def load_input_fields(path, transpose=False):
 
         klon = fields['KLON']
         klev = fields['KLEV']
-
+        print ('KLON',klon)
+        print ('KLEV',klev)
         for argname in argnames:
             fields[argname] = np.ascontiguousarray(f[argname])
 

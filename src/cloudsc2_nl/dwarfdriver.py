@@ -177,14 +177,15 @@ class Dwarf(f90wrap.runtime.FortranModule):
 
 dwarf = Dwarf()
 numomp=1
-nproma=16384
+nproma=100
 nlev=137
-ngptot=16384
-ngptotg=16384
+ngptot=100
+ngptotg=100
 nblocks=1
 ndim=5
 ptsphy=3600.
 pt        = np.zeros((nproma,nlev  ,nblocks), order='F')
+#pttest    = np.zeros((nproma,nlev  ,nblocks), order='F')
 pq        = np.zeros((nproma,nlev  ,nblocks), order='F')
 pap       = np.zeros((nproma,nlev  ,nblocks), order='F')
 paph      = np.zeros((nproma,nlev+1,nblocks), order='F')
@@ -209,13 +210,13 @@ pfhpsn    = np.zeros((nproma,nlev+1,nblocks), order='F')
 buffer_cml     = np.zeros((nproma,nlev,3+ndim,nblocks), order='F')
 buffer_loc     = np.zeros((nproma,nlev,3+ndim,nblocks), order='F')
 #dwarf.do_dwarf_call_full(numomp, nproma, nlev, ngptot, ngptotg, nblocks, ptsphy)
-print("Filling with 33")
-buffer_loc.fill(-33.)
-print("Filled with 33")
-dwarf.examine_ndarray_flags(buffer_cml)
-dwarf.examine_ndarray_flags(buffer_loc)
-dwarf.examine_ndarray_flags(pt)
-dwarf.examine_ndarray_flags(pt)
+#print("Filling with 33")
+#buffer_loc.fill(-33.)
+#print("Filled with 33")
+#dwarf.examine_ndarray_flags(buffer_cml)
+#dwarf.examine_ndarray_flags(buffer_loc)
+#dwarf.examine_ndarray_flags(pt)
+#dwarf.examine_ndarray_flags(pt)
 rootpath = Path(__file__).resolve().parents[2]
 input_path = rootpath/'config-files/input.h5'
 input_fields = load_input_fields(path=input_path)
@@ -230,7 +231,10 @@ ref_fields = load_reference_fields(path=ref_path)
 
 # Populate kernel inputs with raw fields (this splits compound arrays)
 satur_args, cloudsc_args = arguments_from_fields(input_fields)
+print (  satur_args.keys())
 print (cloudsc_args.keys())
+#print (np.transpose(cloudsc_args['ptm1']).shape)
+#print (np.reshape(np.transpose(cloudsc_args['ptm1']),(nproma,nlev,nblocks),order='F').shape)
 #dwarf.do_dwarf_inittest_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
 #                         ptsphy,
 #                         pt,pq,
@@ -248,6 +252,48 @@ dwarf.do_dwarf_init_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
                          plu, plude, pmfu, pmfd,
                          pa,pclv,psupsat,
                          pcovptot)
+
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['ptm1'],(nblocks,nlev,nproma),order='C')),like=pt)
+pt[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['pqm1'],(nblocks,nlev,nproma),order='C')),like=pt)
+pq[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['papp1'],(nblocks,nlev,nproma),order='C')),like=pt)
+pap[:,:,:]=pttest[:,:,:]
+pttesth = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['paphp1'],(nblocks,nlev+1,nproma),order='C')),like=paph)
+paph[:,:,:]=pttesth[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['plude'],(nblocks,nlev,nproma),order='C')),like=pt)
+plude[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['plu'],(nblocks,nlev,nproma),order='C')),like=pt)
+plu[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['pmfu'],(nblocks,nlev,nproma),order='C')),like=pt)
+pmfu[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['pmfd'],(nblocks,nlev,nproma),order='C')),like=pt)
+pmfd[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['psupsat'],(nblocks,nlev,nproma),order='C')),like=pt)
+psupsat[:,:,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['pcovptot'],(nblocks,nlev,nproma),order='C')),like=pt)
+pcovptot[:,:,:]=pttest[:,:,:]
+NCLV = 5      # number of microphysics variables
+NCLDQL = 0    # liquid cloud water
+NCLDQI = 1    # ice cloud water
+NCLDQR = 2    # rain water
+NCLDQS = 3    # snow
+NCLDQV = 4    # vapour
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['pi'],(nblocks,nlev,nproma),order='C')),like=pt)
+pclv[:,:,NCLDQI,:]=pttest[:,:,:]
+pttest = np.asfortranarray(np.transpose(np.reshape(cloudsc_args['pl'],(nblocks,nlev,nproma),order='C')),like=pt)
+pclv[:,:,NCLDQL,:]=pttest[:,:,:]
+#print (pttest.shape)
+#print ('Python pt')
+#dwarf.examine_ndarray_flags(pttest)
+#
+#print(pt[1:10,2])
+#print(np.max(pt-pttest))
+#print(np.min(pt-pttest))
+#print (np.isfortran(pttest))
+#print(np.array_equal(pt,pttest))
+#dwarf.examine_ndarray_flags(pt)
+#dwarf.examine_ndarray_flags(pttest)
 
 dwarf.do_dwarf_full_call(numomp,nproma,nlev,ngptot,nblocks,ngptotg,
                          ptsphy,
